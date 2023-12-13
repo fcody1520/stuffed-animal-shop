@@ -31,10 +31,22 @@ app.get('/all-animals', (req, res) => {
 });
 
 app.get('/animal-details/:animalId', (req, res) => {
-  res.render('animal-details.html.njk', { animal: stuffedAnimalData.elephant });
+  const animalDetails = getAnimalDetails(req.params.animalId)
+  res.render('animal-details.html.njk', { animal: animalDetails });
 });
 
 app.get('/add-to-cart/:animalId', (req, res) => {
+  let animalId = req.params.animalId;
+  if(req.session.cart){
+    if (req.session.cart[animalId]){
+      req.session.cart[animalId]++
+    } else {
+      req.session.cart[animalId] =1
+    } 
+  } else {
+    req.session.cart = {}
+    req.session.cart[animalId] = 1
+  }
   // TODO: Finish add to cart functionality
   // The logic here should be something like:
   // - check if a "cart" exists in the session, and create one (an empty
@@ -42,6 +54,8 @@ app.get('/add-to-cart/:animalId', (req, res) => {
   // - check if the desired animal id is in the cart, and if not, put it in
   // - increment the count for that animal id by 1
   // - redirect the user to the cart page
+  console.log(req.session.cart);
+  res.redirect('/cart')
 });
 
 app.get('/cart', (req, res) => {
@@ -53,7 +67,7 @@ app.get('/cart', (req, res) => {
   // - create an array to hold the animals in the cart, and a variable to hold the total
   // cost of the order
   // - loop over the cart object, and for each animal id:
-  //   - get the animal object by calling getAnimalDetails
+  //   - get the animal object by calling  Details
   //   - compute the total cost for that type of animal
   //   - add this to the order total
   //   - add quantity and total cost as properties on the animal object
