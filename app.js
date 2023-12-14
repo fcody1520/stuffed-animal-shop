@@ -64,20 +64,36 @@ app.get('/cart', (req, res) => {
   // The logic here will be something like:
 
   // - get the cart object from the session
+  let cart = req.session.cart
   // - create an array to hold the animals in the cart, and a variable to hold the total
-  // cost of the order
-  // - loop over the cart object, and for each animal id:
-  //   - get the animal object by calling  Details
-  //   - compute the total cost for that type of animal
-  //   - add this to the order total
-  //   - add quantity and total cost as properties on the animal object
-  //   - add the animal object to the array created above
-  // - pass the total order cost and the array of animal objects to the template
+  let animalsArr = []
+  let orderTotal = 0
 
+  for (let animal in cart){
+    
+    // cost of the order
+      // - loop over the cart object, and for each animal id:
+      //   - get the animal object by calling  Details
+      let currentAnimalDetails = getAnimalDetails(animal)
+      //   - compute the total cost for that type of animal
+      let currentAnimalTotalCost = cart[animal] * currentAnimalDetails.price
+
+      //   - add this to the order total
+      orderTotal = orderTotal + currentAnimalTotalCost
+      //   - add quantity and total cost as properties on the animal object
+      //   - add the animal object to the array created above
+    currentAnimalDetails.subtotal = currentAnimalTotalCost
+    currentAnimalDetails.quantity = cart[animal]
+
+      // - pass the total order cost and the array of animal objects to the template
+    animalsArr.push(currentAnimalDetails)
+
+  }
+    
   // Make sure your function can also handle the case where no cart has
   // been added to the session
 
-  res.render('cart.html.njk');
+  res.render('cart.html.njk', {animals: animalsArr, orderTotal: orderTotal});
 });
 
 app.get('/checkout', (req, res) => {
